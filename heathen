@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+import os
+import random
+import argparse
+import heathen
+import configparser
+import pydoc
+
+heathenconfig = os.path.join(os.path.dirname(os.path.realpath(__file__)),'.heathen')
+if __name__ == '__main__':
+    the_heathen = heathen.Heathen(conf = heathenconfig)
+
+    parser = argparse.ArgumentParser(description='Grab bible verses!')
+
+    verse_help = "Display verse: book chapter:verse(s)\n {} --verse john@3:16-+\n+ is basically * function.".format(parser.prog)
+    #reader_help = "Display chapter or verses in editor:\nbook chapter:verse(s)(-chapter):verse(s)\n {} --reader john@3:1-+".format(parser.prog)
+
+    parser.add_argument("--verse", "-v", help=verse_help, nargs='?', default=None)
+    parser.add_argument("--version", "-b", help='Bible version', nargs=1, default=[the_heathen.heathenconf['MAIN']['version'].strip().rstrip().lower()], metavar=("version"))
+    parser.add_argument("--list", "-l", help='List books in module', action='store_true')
+
+    parser.add_argument('--add_module', '-a', nargs=1, default=None, metavar=("module"))
+    parser.add_argument('--search_modules', '-s', nargs='?', help="Specify section with -k default is about", default=None, metavar=("string-regex"))
+    parser.add_argument('--section', '-k', nargs='?', help="Section to search", default="about", metavar=("sectionname"))
+    parser.add_argument('--uninstall_module', '-u', nargs=1, default=None, metavar=("module"))
+    parser.add_argument("--list_installed", "-i", help="list installed repos", action='store_true')
+    parser.add_argument('--sync_repos', '-y', help="Update repositories", action='store_true')
+
+    args = parser.parse_args()
+
+    the_heathen.version = (args.version[0]).strip().rstrip().lower()
+    
+    #to be implemented
+    if args.add_module != None:
+        pass
+    if args.search_modules != None:
+        pass
+    if args.uninstall_module != None:
+        pass
+    if args.sync_repos:
+        pass
+    if args.list_installed:
+        pass
+    #to be implemented
+    if args.verse != None:
+        book, chapter_and_verse = args.verse.split('@')
+        chapter_and_verse = chapter_and_verse.split(':')
+        chapter = chapter_and_verse[0]
+        if len(chapter_and_verse) > 1:
+            verse = chapter_and_verse[1]
+        else:
+            verse = None
+        result = the_heathen.return_verse(book, int(chapter), verse)
+        print(result)
+
+    elif args.list:
+        books  = the_heathen.bible.get_structure().get_books()
+        string = ""
+        for book in ['ot','nt']:
+            for item in range(0,len(books[book])):
+                string+="\n{}: {}".format(item+1, books[book][item].name)
+        pydoc.pager(string)
+
+
+    else:
+        print("""    _     _ _______ _______ _______ _     _ _______ __   _
+    |_____| |______ |_____|    |    |_____| |______ | \  |
+    |     | |______ |     |    |    |     | |______ |  \_|
+    [                   Read Your Bible                  ]  \n\n""")
+        parser.print_help()
+
+
+
