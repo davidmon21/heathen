@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+from posixpath import expanduser
 import random
 import argparse
 import configparser
@@ -46,6 +47,9 @@ class Heathen():
             selected = list(range(1,self.bible.get_structure().find_book(book)[1].chapter_lengths[chapter-1]+1))
         return self.bible.get(books=[book],  chapters=int(chapter), verses=selected)
 
+    def update_repo():
+        pass
+
     # def heathen_first_run(self):
     #     self.displayer("Welcome to heathen!")
     #     answer = self.handlingfunction("Do you have an existing sword path?(y/n)").lower()
@@ -88,3 +92,4 @@ class Heathen():
 
     #     with open(self.heathenconfig,'w') as conf2:
     #         self.heathenconf.write(conf2)
+    
