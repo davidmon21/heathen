@@ -1,6 +1,8 @@
 import os
 from urllib import request
 import tarfile
+import configparser
+from ftplib import FTP
 
 class RepoManager:
     local_path = "~/.sword"
@@ -26,12 +28,30 @@ class RepoManager:
         print(uri)
         request.urlretrieve(uri, destination)
         return destination
-    def grab_mod(self):
-        #read mod conf
-        #urlpath read ftp path based on mod conf
-        #pull each file
-        pass
+    def grab_mod(self, modulename):
+        path = os.path.join(self.local_path,'mods.d',modulename+'.conf')
+        
+        module_info = configparser.ConfigParser()
+        module_info.read(path)
+        module_path = module_info[modulename.upper()]['DataPath']
+        
+        down_path = os.path.join(self.local_path, module_path)
+        os.makedirs(down_path)
+        
+        url = self.default_repo+'/'+module_path
+        
+        ftp = FTP(self.default_repo_server)
+        ftp.login()
+        ftp.cwd("."+url)
+        
+        files = ftp.nlst()
+
+        for file in files:
+            request.urlretrieve("ftp://{}{}/{}".format(self.default_repo_server,url,file),os.path.join(down_path,file))
+
+        return 0
 
 
 repo = RepoManager("/Users/david/temporary/.sword","/pub/sword/raw","ftp.crosswire.org")
-repo.prep_local_repo()
+#repo.prep_local_repo()
+repo.grab_mod('drc')
